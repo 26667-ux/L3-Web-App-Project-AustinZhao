@@ -23,11 +23,24 @@
                     <a href="#">About</a>
                 </div>
             </div>
-            <div class="search-bar"><p>Search Bar</p></div>
+            
+            <form action="/search" method="GET">
+                <input class="search-bar" type="text" name="query" placeholder="Search games...">
+            </form>
+            
             <div class="profile"><p>Profile / Login</p></div>
         </div>
 
-        <div class="content"></div>
+        <div class="content">
+            {% if games %}
+                {% for game in games %}
+                    <div class="game-card">
+                        <h2>{{game['title']}}</h2>
+                        <p>Price: ${{ game['price'] }}</p>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>

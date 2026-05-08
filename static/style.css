@@ -34,19 +34,19 @@ body {
 }
 
 .nav-item {
-    padding: 10px 30px;
-    background: #2f4556;
-    color: white;
-    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+  padding: 10px 30px;
+  background: #2f4556;
+  color: white;
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
 }
 
-.search-bar {
-    flex: 1;
-    background: #2f4556;
-    color: #ccc;
-    padding: 0px 10px;
-    border-radius: 25px;
-    text-align: center;
+.search-bar{
+  width:500px;
+  padding:12px;
+  border:none;
+  border-radius:25px;
+  background:#23384c;
+  color:white;
 }
 
 .profile {
@@ -56,9 +56,18 @@ body {
   clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
 }
 
-.content {
-  margin-top: 40px;
-  height: 800px;
-  background: #8fa3b1;
-  border-radius: 25px;
+.content{
+  width:80%;
+  margin:50px auto;
+  background:#9aacb8;
+  border-radius:25px;
+  min-height:500px;
+  padding:30px;
+}
+
+.game-card{
+  background:white;
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:15px;
 }
