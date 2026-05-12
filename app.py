@@ -9,7 +9,7 @@ def index():
 
 @app.route('/search')
 def search():
-    query = request.args.get('query')
+    query = request.args.get('query', '').strip()
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
@@ -17,6 +17,10 @@ def search():
     games = cursor.fetchall()
     conn.close()
     return render_template('index.html', games=games)
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
     
 if __name__ == '__main__':
     app.run(debug=True)

@@ -8,15 +8,6 @@ body {
   padding: 20px;
 }
 
-.navbar {
-  display: flex;
-  align-items: center;
-  background: #4f6778;
-  padding: 20px;
-  border-radius: 20px;
-  gap: 20px;
-}
-
 .logo {
   width: 70px;
   height: 70px;
@@ -27,10 +18,37 @@ body {
   justify-content: center;
   border-radius: 50%;
 }
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  background: #4f6778;
+  padding: 20px;
+  border-radius: 20px;
+  gap: 20px;
+}
 
 .nav-links {
   display: flex;
   gap: 15px;
+  flex-wrap: wrap;
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 500px;
+  padding: 12px;
+  border: none;
+  border-radius: 25px;
+  background: #23384c;
+  color: white;
+  box-sizing: border-box;
+}
+
+form {
+  flex: 1;
+  min-width: 200px;
 }
 
 .nav-item {
@@ -38,15 +56,6 @@ body {
   background: #2f4556;
   color: white;
   clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-}
-
-.search-bar{
-  width:500px;
-  padding:12px;
-  border:none;
-  border-radius:25px;
-  background:#23384c;
-  color:white;
 }
 
 .profile {
@@ -70,4 +79,26 @@ body {
   padding:20px;
   margin-bottom:20px;
   border-radius:15px;
+}
+
+@media (max-width: 768px) {
+
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav-links {
+    justify-content: center;
+  }
+
+  .profile {
+    text-align: center;
+  }
+
+  .content {
+    width: 95%;
+    padding: 15px;
+  }
+
 }
