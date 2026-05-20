@@ -5,5 +5,14 @@
             "envManager": "ms-python.python:venv",
             "packageManager": "ms-python.python:pip"
         }
-    ]
+    ],
+    "editor.bracketPairColorization.enabled": false,
+    "python.analysis.aiHoverSummaries": false,
+    "python.analysis.indexing.followSymlinkedFolders": true,
+    "python.terminal.shellIntegration.enabled": true,
+    "python.analysis.aiCodeActions": {
+        "implementAbstractClasses": false,
+        "generateSymbol": false,
+        "convertFormatString": false
+    }
 }

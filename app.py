@@ -18,6 +18,13 @@ def search():
     conn.close()
     return render_template('index.html', games=games)
 
+@app.route('/game/<int:game_id>')
+def game_detail(game_id)
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
