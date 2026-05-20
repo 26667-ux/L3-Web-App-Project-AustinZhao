@@ -34,10 +34,12 @@
         <div class="content">
             {% if games %}
                 {% for game in games %}
-                    <div class="game-card">
-                        <h2>{{game['title']}}</h2>
-                        <p>Price: ${{ game['price'] }}</p>
-                    </div>
+                    <a class="game-card-link" href="/game/{{ game['game_id'] }}">
+                        <div class="game-card">
+                            <h2>{{game['title']}}</h2>
+                            <p>Price: ${{ game['price'] }}</p>
+                        </div>
+                    </a>
                 {% endfor %}
             {% endif %}
         </div>

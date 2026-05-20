@@ -74,6 +74,12 @@ form {
   padding:30px;
 }
 
+.game-card-link {
+  color: inherit;
+  display: block;
+  text-decoration: none;
+}
+
 .game-card{
   background:white;
   padding:20px;
