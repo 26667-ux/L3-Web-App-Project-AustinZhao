@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>Game Review Database</title>
+    <title>About - Game Review Database</title>
 </head>
 <body>
     <div class="container">
@@ -23,34 +23,17 @@
                     <a href="/about">About</a>
                 </div>
             </div>
-            
             <form action="/search" method="GET">
-                <input class="search-bar" type="text" name="query" placeholder="Search games..." value="{{ query or '' }}">
+                <input class="search-bar" type="text" name="query" placeholder="Search games...">
             </form>
-            
             <div class="profile"><p>Sprint 1</p></div>
         </div>
 
         <div class="content">
             <div class="content-header">
-                <h1>{{ page_title or 'All Games' }}</h1>
-                <p>{{ message }}</p>
+                <h1>About</h1>
+                <p>This web app helps users compare video games by title, price, and rating.</p>
             </div>
-
-            {% if games %}
-                {% for game in games %}
-                    <div class="game-card">
-                        <h2>{{ game['title'] }}</h2>
-                        <p>Price: ${{ "%.2f"|format(game['price']) }}</p>
-                        <p>Average rating: {{ game['average_rating'] }}/5</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="empty-state">
-                    <h2>No games found</h2>
-                    <p>Try searching for another game title.</p>
-                </div>
-            {% endif %}
         </div>
     </div>
 </body>

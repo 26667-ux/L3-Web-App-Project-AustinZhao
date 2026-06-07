@@ -2,26 +2,56 @@ from flask import Flask, render_template, request, abort
 import sqlite3
 
 app = Flask(__name__)
+DATABASE = 'database.db'
+
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM game ORDER BY title ASC")
+    games = cursor.fetchall()
+    conn.close()
+    return render_template('index.html', games=games, page_title='All Games', message='Browse the current game database or search by title.')
 
 @app.route('/search')
 def search():
     query = request.args.get('query', '').strip()
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM game WHERE title LIKE ?", ('%' + query + '%',))
+    if query == '':
+        cursor.execute("SELECT * FROM game ORDER BY title ASC")
+        message = 'Showing al games'
+    else:
+        cursor.execute("SELECT * FROM game WHERE title LIKE ? ORDER BY title ASC", ('%' + query + '%',))
+        message = 'Showing results for "' + query + '".'
     games = cursor.fetchall()
     conn.close()
-    return render_template('index.html', games=games)
+    return render_template('index.html', games=games, query=query, page_title='Search Results', message=message)
+
+
+@app.route('/top')
+def top_game():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM game ORDER BY average_rating DESC, title ASC")
+    games = cursor.fetchall()
+    conn.close()
+    return render_template('index.html', games=games, page_title='Top Rated Games', message='Games ordered by highest average rating.')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 
 @app.route('/game/<int:game_id>')
 def game_detail(game_id):
-    conn = sqlite3.connect('database.db')
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute( """
                     SELECT 
