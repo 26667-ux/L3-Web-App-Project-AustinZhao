@@ -4,20 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <title>{{ game['title'] }} - Planned for Sprint 2</title>
+    <title>{{ game['title'] }} - Game Details</title>
 </head>
 <body>
     <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <p>GAME DB</p>
+            </div>
+            <div class="nav-links">
+                <div class="nav-item">
+                    <a href="/">Games</a>
+                </div>
+                <div class="nav-item">
+                    <a href="/top">Top</a>
+                </div>
+                <div class="nav-item">
+                    <a href="/about">About</a>
+                </div>
+            </div>
+            <form action="/search" method="GET">
+                <input class="search-bar" type="text" name="query" placeholder="Search games...">
+            </form>
+            <div class="profile"><p>Sprint 2</p></div>
+        </div>
+
         <div class="content">
             <div class="content-header">
                 <h1>{{ game['title'] }}</h1>
-                <p>The full game detail and review page is planned for Sprint 2.</p>
+                <p>Game details, publisher information, and user reviews.</p>
             </div>
-            <div class="game-card">
-                <p>Current Sprint 1 data:</p>
+
+            <div class="game-card detail-card">
+                <p>Release date: {{ game['release_date'] }}</p>
                 <p>Price: ${{ "%.2f"|format(game['price']) }}</p>
                 <p>Average rating: {{ game['average_rating'] }}/5</p>
+                <p>Category: {{ game['category_name'] }}</p>
+                <p>Publisher: {{ game['publisher_name'] }}</p>
             </div>
+
+            <div class="section-block">
+                <h2>Reviews</h2>
+
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review-card">
+                            <h3>{{ review['username'] }}</h3>
+                            <p>Rating: {{ review['rating'] }}/5</p>
+                            <p>{{ review['review_text'] }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <h2>No reviews yet</h2>
+                        <p>Be the first person to review this game.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="section-block">
+                <h2>Add a review</h2>
+
+                <form class="review-form" action="/game/{{ game['game_id'] }}" method="POST">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" name="username" placeholder="Your username">
+
+                    <label for="email">Email</label>
+                    <input id="email" type="email" name="email" placeholder="Your email">
+
+                    <label for="rating">Rating</label>
+                    <input id="rating" type="number" name="rating" min="1" max="5" placeholder="1 to 5">
+
+                    <label for="review_text">Review</label>
+                    <textarea id="review_text" name="review_text" rows="5" placeholder="Write your review here"></textarea>
+
+                    <button type="submit">Submit review</button>
+                </form>
+            </div>
+
             <a class="button-link" href="/">Back to games</a>
         </div>
     </div>
