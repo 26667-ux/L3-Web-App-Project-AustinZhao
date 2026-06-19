@@ -156,6 +156,48 @@ form {
   text-decoration: none;
 }
 
+.error-message {
+  background: #f4d6d6;
+  color: #5c1f1f;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-sizing: border-box;
+}
+
+.review-form label {
+  font-weight: bold;
+  color: #1d2d3a;
+}
+
+.review-form input,
+.review-form textarea {
+  padding: 12px;
+  border: 1px solid #9aacb8;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.review-form button {
+  width: fit-content;
+  padding: 12px 18px;
+  border: none;
+  background: #2f4556;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
 
   .navbar {

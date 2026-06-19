@@ -65,6 +65,12 @@
             <div class="section-block">
                 <h2>Add a review</h2>
 
+                {% if error %}
+                    <div class="error-message">
+                        <p>{{ error }}</p>
+                    </div>
+                {% endif %}
+
                 <form class="review-form" action="/game/{{ game['game_id'] }}" method="POST">
                     <label for="username">Username</label>
                     <input id="username" type="text" name="username" placeholder="Your username">
