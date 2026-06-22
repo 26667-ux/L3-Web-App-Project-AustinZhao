@@ -9,6 +9,7 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+
 @app.route('/')
 def index():
     conn = get_db_connection()
@@ -49,28 +50,42 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/game/<int:game_id>')
+@app.route('/game/<int:game_id>', methods=['GET', 'POST'])
 def game_detail(game_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute( """
-                    SELECT 
-                        game.game_id,
-                        game.title,
-                        game.release_date,
-                        game.price, 
-                        game.average_rating, 
-                        category.name AS category_name, 
-                        publisher.name AS publisher_name
-                    FROM game
-                    LEFT JOIN category ON game.category_id = category.category_id
-                    LEFT JOIN publisher ON game.publisher_id = publisher.publisher_id
-                    WHERE game.game_id = ?
-                    """, (game_id,))
+        SELECT 
+            game.game_id,
+            game.title,
+            game.release_date,
+            game.price, 
+            game.average_rating, 
+            category.name AS category_name, 
+            publisher.name AS publisher_name
+        FROM game
+        LEFT JOIN category ON game.category_id = category.category_id
+        LEFT JOIN publisher ON game.publisher_id = publisher.publisher_id
+        WHERE game.game_id = ?
+    """, (game_id,))
     game = cursor.fetchall()
     if game is None:
         conn.close()
         abort(404)
+    error = None
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        rating = request.form.get('rating', '').strip()
+        review_text = request.form.get('review_text', '').strip()
+    if username == '' or email == '' or rating == '' or review_text == '':
+        error = 'Please fill in every field before submitting a review.'
+    else:
+        try:
+            rating_number = int(rating)
+        except ValueError:
+            error = 'Rating myst be a number between 1 to 5'
+
     conn.close()
     return render_template('game_detail.html', game=game)
 
