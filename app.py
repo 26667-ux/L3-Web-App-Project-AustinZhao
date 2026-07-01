@@ -83,9 +83,30 @@ def game_detail(game_id):
     else:
         try:
             rating_number = int(rating)
-        except ValueError:
+        if rating_number < 1 or rating_number > 5:
             error = 'Rating myst be a number between 1 to 5'
-
+        else:
+            cursor.execute("SELECT user_id FROM user WHERE username = ?",(username,))
+            user = cursor.fetchone()
+            if user is None:
+                cursor.execute("INSERT INTO user (username, email) VALUES (?, ?)",(username, email))
+                user_id = cursor.lastrowid
+            else: user_id = user['user_id']
+            cursor.execute(
+                """
+                INSERT INTO review (rating, review_text, user_id, game_ud)
+                VALUES (?, ?, ?, ?)
+                """,
+                (rating_number, review_text, user_id, game_id)
+            )
+            cursor.execute("SELECT AVG(rating) AS new_rating FROM review WHERE game_id = ?",(game_id,))
+            new_rating = cursor.fetchall()['new_rating']
+            cursor.execute("UPDATE game SET average_rating = ? WHERE game_id = ?",(round(new_rating, 1),game_id))
+            conn.commit()
+            conn.close()
+            return redirect(url_for('game_detail',game_id=game_id,review_added='yes'))
+        except ValueError:
+            error = 'Rating must be a number between 1 and 5.'
     conn.close()
     return render_template('game_detail.html', game=game)
 
