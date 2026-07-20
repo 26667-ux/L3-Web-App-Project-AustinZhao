@@ -68,7 +68,7 @@ def game_detail(game_id):
         LEFT JOIN publisher ON game.publisher_id = publisher.publisher_id
         WHERE game.game_id = ?
     """, (game_id,))
-    game = cursor.fetchall()
+    game = cursor.fetchone()
     if game is None:
         conn.close()
         abort(404)
@@ -78,37 +78,51 @@ def game_detail(game_id):
         email = request.form.get('email', '').strip()
         rating = request.form.get('rating', '').strip()
         review_text = request.form.get('review_text', '').strip()
-    if username == '' or email == '' or rating == '' or review_text == '':
-        error = 'Please fill in every field before submitting a review.'
-    else:
-        try:
-            rating_number = int(rating)
-        if rating_number < 1 or rating_number > 5:
-            error = 'Rating myst be a number between 1 to 5'
+        if username == '' or email == '' or rating == '' or review_text == '':
+            error = 'Please fill in every field before submitting a review.'
         else:
-            cursor.execute("SELECT user_id FROM user WHERE username = ?",(username,))
-            user = cursor.fetchone()
-            if user is None:
-                cursor.execute("INSERT INTO user (username, email) VALUES (?, ?)",(username, email))
-                user_id = cursor.lastrowid
-            else: user_id = user['user_id']
-            cursor.execute(
-                """
-                INSERT INTO review (rating, review_text, user_id, game_ud)
-                VALUES (?, ?, ?, ?)
-                """,
-                (rating_number, review_text, user_id, game_id)
-            )
-            cursor.execute("SELECT AVG(rating) AS new_rating FROM review WHERE game_id = ?",(game_id,))
-            new_rating = cursor.fetchall()['new_rating']
-            cursor.execute("UPDATE game SET average_rating = ? WHERE game_id = ?",(round(new_rating, 1),game_id))
-            conn.commit()
-            conn.close()
-            return redirect(url_for('game_detail',game_id=game_id,review_added='yes'))
-        except ValueError:
-            error = 'Rating must be a number between 1 and 5.'
+            try:
+                rating_number = int(rating)
+                if rating_number < 1 or rating_number > 5:
+                    error = 'Rating myst be a number between 1 to 5'
+                else:
+                    cursor.execute("SELECT user_id FROM user WHERE username = ?",(username,))
+                    user = cursor.fetchone()
+                    if user is None:
+                        cursor.execute("INSERT INTO user (username, email) VALUES (?, ?)",(username, email))
+                        user_id = cursor.lastrowid
+                    else: user_id = user['user_id']
+                    cursor.execute(
+                        """
+                        INSERT INTO review (rating, review_text, user_id, game_id)
+                        VALUES (?, ?, ?, ?)
+                        """,
+                        (rating_number, review_text, user_id, game_id)
+                    )
+                    cursor.execute("SELECT AVG(rating) AS new_rating FROM review WHERE game_id = ?",(game_id,))
+                    new_rating = cursor.fetchone()['new_rating']
+                    cursor.execute("UPDATE game SET average_rating = ? WHERE game_id = ?",(round(new_rating, 1),game_id))
+                    conn.commit()
+                    conn.close()
+                    return redirect(url_for('game_detail',game_id=game_id,review_added='yes'))
+            except ValueError:
+                error = 'Rating must be a number between 1 and 5.'
+
+    cursor.execute("""
+        SELECT
+            review.rating,
+            review.review_text,
+            review.created_at,
+            user.username
+        FROM review
+        LEFT JOIN user ON review.user_id = user.user_id
+        WHERE review.game_id = ?
+        ORDER BY review.created_at DESC
+    """, (game_id,))
+    reviews = cursor.fetchall()
+
     conn.close()
-    return render_template('game_detail.html', game=game)
+    return render_template('game_detail.html', game=game, reviews=reviews, error=error, review_added=request.args.get('review_added'))
 
 @app.errorhandler(404)
 def page_not_found(e):

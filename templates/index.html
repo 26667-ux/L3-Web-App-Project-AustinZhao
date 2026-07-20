@@ -39,11 +39,13 @@
 
             {% if games %}
                 {% for game in games %}
-                    <div class="game-card">
-                        <h2>{{ game['title'] }}</h2>
-                        <p>Price: ${{ "%.2f"|format(game['price']) }}</p>
-                        <p>Average rating: {{ game['average_rating'] }}/5</p>
-                    </div>
+                    <a class="game-card-link" href="/game/{{ game['game_id'] }}">
+                        <div class="game-card">
+                            <h2>{{ game['title'] }}</h2>
+                            <p>Price: ${{ "%.2f"|format(game['price']) }}</p>
+                            <p>Average rating: {{ game['average_rating'] }}/5</p>
+                        </div>
+                    </a>
                 {% endfor %}
             {% else %}
                 <div class="empty-state">
