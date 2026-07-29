@@ -50,6 +50,29 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/wishlist')
+def wishlist():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT
+            wishlist.wishlist_id,
+            wishlist.created_at,
+            user.username,
+            game.game_id,
+            game.title,
+            game.price,
+            game.average_rating
+        FROM wishlist
+        LEFT JOIN user ON wishlist.user_id = user.user_id
+        LEFT JOIN game ON wishlist.game_id = game.game_id
+        ORDER BY user.username ASC, game.title ASC
+    """)
+    wishlist_items = cursor.fetchall()
+    conn.close()
+    return render_template('wishlist.html',wishlist_items=wishlist_items)
+
+
 @app.route('/game/<int:game_id>', methods=['GET', 'POST'])
 def game_detail(game_id):
     conn = get_db_connection()
@@ -73,7 +96,21 @@ def game_detail(game_id):
         conn.close()
         abort(404)
     error = None
+    wishlist_error = None
+
     if request.method == 'POST':
+        form_type = request.form.get('form_type')
+
+        if form_type == 'wishlist':
+            username = request.form.get('wishlist_username', '').strip()
+            if username == '':
+                wishlist_error = 'Please enter a username before adding to wishlist.'
+            else:
+                cursor.execute(
+                    "SELECT user_id FROM user WHERE username = ?",
+                    (username,)
+                )
+                user = cursor.fetchone()
         username = request.form.get('username', '').strip()
         email = request.form.get('email', '').strip()
         rating = request.form.get('rating', '').strip()
