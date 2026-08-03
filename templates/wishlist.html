@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Wishlist - Game Review Database</title>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <p>GAME DB</p>
+            </div>
+            <div class="nav-links">
+                <div class="nav-item">
+                    <a href="/">Games</a>
+                </div>
+                <div class="nav-item">
+                    <a href="/top">Top</a>
+                </div>
+                <div class="nav-item">
+                    <a href="/wishlist">Wishlist</a>
+                </div>
+                <div class="nav-item">
+                    <a href="/about">About</a>
+                </div>
+            </div>
+            <form action="/search" method="GET">
+                <input class="search-bar" type="text" name="query" placeholder="Search games...">
+            </form>
+            <div class="profile"><p>Sprint 3</p></div>
+        </div>
+
+        <div class="content">
+            <div class="content-header">
+                <h1>Wishlist</h1>
+                <p>Games that users have saved for later.</p>
+            </div>
+
+            {% if wishlist_items %}
+                {% for item in wishlist_items %}
+                    <div class="wishlist-card">
+                        <div>
+                            <h2>{{ item['title'] }}</h2>
+                            <p>User: {{ item['username'] }}</p>
+                            <p>Price: ${{ "%.2f"|format(item['price']) }}</p>
+                            <p>Average rating: {{ item['average_rating'] }}/5</p>
+                        </div>
+
+                        <div class="wishlist-actions">
+                            <a class="button-link" href="/game/{{ item['game_id'] }}">View game</a>
+
+                            <form action="/wishlist/delete/{{ item['wishlist_id'] }}" method="POST">
+                                <button type="submit">Remove</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <h2>No wishlist items</h2>
+                    <p>Add a game to a user wishlist from the game detail page.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

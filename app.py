@@ -111,40 +111,71 @@ def game_detail(game_id):
                     (username,)
                 )
                 user = cursor.fetchone()
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        rating = request.form.get('rating', '').strip()
-        review_text = request.form.get('review_text', '').strip()
-        if username == '' or email == '' or rating == '' or review_text == '':
-            error = 'Please fill in every field before submitting a review.'
-        else:
-            try:
-                rating_number = int(rating)
-                if rating_number < 1 or rating_number > 5:
-                    error = 'Rating myst be a number between 1 to 5'
-                else:
-                    cursor.execute("SELECT user_id FROM user WHERE username = ?",(username,))
-                    user = cursor.fetchone()
-                    if user is None:
-                        cursor.execute("INSERT INTO user (username, email) VALUES (?, ?)",(username, email))
-                        user_id = cursor.lastrowid
-                    else: user_id = user['user_id']
+                if user is None:
                     cursor.execute(
-                        """
-                        INSERT INTO review (rating, review_text, user_id, game_id)
-                        VALUES (?, ?, ?, ?)
-                        """,
-                        (rating_number, review_text, user_id, game_id)
+                        "INSERT INTO user (username, email) VALUES (?, ?)",
+                        (username, username + '@example.com')
                     )
-                    cursor.execute("SELECT AVG(rating) AS new_rating FROM review WHERE game_id = ?",(game_id,))
-                    new_rating = cursor.fetchone()['new_rating']
-                    cursor.execute("UPDATE game SET average_rating = ? WHERE game_id = ?",(round(new_rating, 1),game_id))
+                    user_id = cursor.lastrowid
+                else:
+                    user_id = user['user_id']
+
+                cursor.execute(
+                    """
+                    SELECT wishlist_id FROM wishlist
+                    WHERE user_id = ? AND game_id = ?
+                    """,
+                    (user_id, game_id)
+                )
+                wishlist_item = cursor.fetchone()
+
+                if wishlist_item is None:
+                    cursor.execute(
+                        "INSERT INTO wishlist (user_id) VALUES (?, ?)",
+                        (user_id, game_id)
+                    )
                     conn.commit()
                     conn.close()
-                    return redirect(url_for('game_detail',game_id=game_id,review_added='yes'))
-            except ValueError:
-                error = 'Rating must be a number between 1 and 5.'
-
+                    return redirect(url_for{
+                        'game_detail',
+                        game_id=game_id,
+                        wishlist_added='yes'
+                    })
+                wishlist_error = 'This game is aleady in that user wishlist.'
+        else:
+            username = request.form.get('username', '').strip()
+            email = request.form.get('email', '').strip()
+            rating = request.form.get('rating', '').strip()
+            review_text = request.form.get('review_text', '').strip()
+            if username == '' or email == '' or rating == '' or review_text == '':
+                error = 'Please fill in every field before submitting a review.'
+            else:
+                try:
+                    rating_number = int(rating)
+                    if rating_number < 1 or rating_number > 5:
+                        error = 'Rating myst be a number between 1 to 5'
+                    else:
+                        cursor.execute("SELECT user_id FROM user WHERE username = ?",(username,))
+                        user = cursor.fetchone()
+                        if user is None:
+                            cursor.execute("INSERT INTO user (username, email) VALUES (?, ?)",(username, email))
+                            user_id = cursor.lastrowid
+                        else: user_id = user['user_id']
+                        cursor.execute(
+                            """
+                            INSERT INTO review (rating, review_text, user_id, game_id)
+                            VALUES (?, ?, ?, ?)
+                            """,
+                            (rating_number, review_text, user_id, game_id)
+                        )
+                        cursor.execute("SELECT AVG(rating) AS new_rating FROM review WHERE game_id = ?",(game_id,))
+                        new_rating = cursor.fetchone()['new_rating']
+                        cursor.execute("UPDATE game SET average_rating = ? WHERE game_id = ?",(round(new_rating, 1),game_id))
+                        conn.commit()
+                        conn.close()
+                        return redirect(url_for('game_detail',game_id=game_id,review_added='yes'))
+                except ValueError:
+                    error = 'Rating must be a number between 1 and 5.'
     cursor.execute("""
         SELECT
             review.rating,
@@ -157,7 +188,17 @@ def game_detail(game_id):
         ORDER BY review.created_at DESC
     """, (game_id,))
     reviews = cursor.fetchall()
-
+    cursor.execute("""
+        SELECT
+            user.username,
+            wishlist.created_at
+        FROM wishlist
+        LEFT JOIN user ON wishlist.user_id = user.user_id
+        WHERE wishlist.game_id = ?
+        ORDER BY user.username ASC
+    """, (game_id,))
+    wishlist_users = cursor.fetchall()
+    
     conn.close()
     return render_template('game_detail.html', game=game, reviews=reviews, error=error, review_added=request.args.get('review_added'))
 
